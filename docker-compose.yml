@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: opendealz
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-opendealz-dev-db-password-change-this}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d opendealz"]
       interval: 5s
@@ -25,9 +25,10 @@ services:
         required: false
     command: >
       sh -c "
-      export DATABASE_URL=$${DATABASE_URL:-postgresql+asyncpg://postgres:postgres@db:5432/opendealz} &&
-      export DATABASE_URL_SYNC=$${DATABASE_URL_SYNC:-postgresql+psycopg2://postgres:postgres@db:5432/opendealz} &&
-      export SECRET_KEY=$${SECRET_KEY:-dev-secret-key-change-me} &&
+      export DB_PASSWORD=$${POSTGRES_PASSWORD:-opendealz-dev-db-password-change-this} &&
+      export DATABASE_URL=$${DATABASE_URL:-postgresql+asyncpg://postgres:$${DB_PASSWORD}@db:5432/opendealz} &&
+      export DATABASE_URL_SYNC=$${DATABASE_URL_SYNC:-postgresql+psycopg2://postgres:$${DB_PASSWORD}@db:5432/opendealz} &&
+      export SECRET_KEY=$${SECRET_KEY:-$$(python -c 'import secrets; print(secrets.token_urlsafe(48))')} &&
       alembic upgrade head &&
       uvicorn app.main:app --host 0.0.0.0 --port 8000
       "
