@@ -1,17 +1,43 @@
-version: "3.9"
-
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: opendealz_db
+    environment:
+      POSTGRES_DB: opendealz
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-opendealz-dev-db-password-change-this}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d opendealz"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: opendealz_backend
     env_file:
-      - ./backend/.env
+      - path: ./backend/.env
+        required: false
+    command: >
+      sh -c "
+      export DB_PASSWORD=$${POSTGRES_PASSWORD:-opendealz-dev-db-password-change-this} &&
+      export DATABASE_URL=$${DATABASE_URL:-postgresql+asyncpg://postgres:$${DB_PASSWORD}@db:5432/opendealz} &&
+      export DATABASE_URL_SYNC=$${DATABASE_URL_SYNC:-postgresql+psycopg2://postgres:$${DB_PASSWORD}@db:5432/opendealz} &&
+      export SECRET_KEY=$${SECRET_KEY:-opendealz-dev-secret-key-bdf26f8a5ef246a09ff72245158f3cd7} &&
+      alembic upgrade head &&
+      uvicorn app.main:app --host 0.0.0.0 --port 8000
+      "
     expose:
       - "8000"
     restart: unless-stopped
-    depends_on: []
+    depends_on:
+      db:
+        condition: service_healthy
 
   frontend:
     build:
@@ -19,7 +45,8 @@ services:
       dockerfile: Dockerfile
     container_name: opendealz_frontend
     env_file:
-      - ./frontend/.env
+      - path: ./frontend/.env
+        required: false
     expose:
       - "3000"
     restart: unless-stopped
@@ -35,3 +62,6 @@ services:
       - backend
       - frontend
     restart: unless-stopped
+
+volumes:
+  pgdata:
