@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import auth, users, orders, contracts, disputes, notifications, admin
+from app.core.database import AsyncSessionLocal
+from app.services.auth_service import ensure_demo_users
 
 app = FastAPI(
     title="OpenDealz API",
@@ -24,6 +26,12 @@ app.include_router(contracts.router)
 app.include_router(disputes.router)
 app.include_router(notifications.router)
 app.include_router(admin.router)
+
+
+@app.on_event("startup")
+async def seed_demo_users() -> None:
+    async with AsyncSessionLocal() as db:
+        await ensure_demo_users(db)
 
 
 @app.get("/health")

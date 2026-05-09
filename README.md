@@ -38,6 +38,10 @@ cp ./frontend/.env.example ./frontend/.env
 
 ## Тестовые данные (для ручной проверки UI)
 
+Тестовые логины для входа (создаются автоматически при старте backend):
+- **Customer**: `customer@opendealz.local` / `Customer123!`
+- **Executor**: `executor@opendealz.local` / `Executor123!`
+
 Создание заказа:
 - **Title**: `Landing page redesign`
 - **Description**: `Need redesign of landing page with mobile-first layout and React implementation`

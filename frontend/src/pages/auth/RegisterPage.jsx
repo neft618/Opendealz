@@ -29,7 +29,7 @@ export function RegisterPage() {
       setLoading(true);
       await authApi.register(data);
       const { data: tokens } = await authApi.login({ email: data.email, password: data.password });
-      const { data: user } = await authApi.me();
+      const { data: user } = await authApi.me(tokens.access_token);
       login(user, tokens.access_token, tokens.refresh_token);
       toast.success('Account created!');
       navigate('/orders');
