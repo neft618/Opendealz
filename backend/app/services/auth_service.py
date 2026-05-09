@@ -1,3 +1,4 @@
+import logging
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
@@ -8,12 +9,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.security import hash_password, verify_password, create_access_token, create_refresh_token, decode_token
-from app.models.user import User, Profile
+from app.core.config import settings
+from app.models.user import User, Profile, UserRole
 from app.models.audit import AuditLog
 from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse
 from app.services.notification_service import create_notification, send_email
 from app.models.notification import NotificationType
 import hashlib
+
+logger = logging.getLogger(__name__)
 
 
 def _audit_hash(entity_id: str, action: str, ts: str) -> str:
@@ -104,3 +108,53 @@ async def refresh_tokens(db: AsyncSession, refresh_token: str) -> TokenResponse:
     access_token = create_access_token({"sub": str(user.id)})
     new_refresh = create_refresh_token({"sub": str(user.id)})
     return TokenResponse(access_token=access_token, refresh_token=new_refresh)
+
+
+async def ensure_demo_users(db: AsyncSession) -> None:
+    if not settings.DEMO_USERS_ENABLED:
+        return
+    if not all([
+        settings.DEMO_CUSTOMER_EMAIL,
+        settings.DEMO_CUSTOMER_PASSWORD,
+        settings.DEMO_EXECUTOR_EMAIL,
+        settings.DEMO_EXECUTOR_PASSWORD,
+    ]):
+        logger.warning("Demo users are enabled but credentials are not fully configured")
+        return
+
+    demo_users = [
+        {
+            "email": settings.DEMO_CUSTOMER_EMAIL,
+            "password": settings.DEMO_CUSTOMER_PASSWORD,
+            "full_name": "Demo Customer",
+            "role": UserRole.customer,
+        },
+        {
+            "email": settings.DEMO_EXECUTOR_EMAIL,
+            "password": settings.DEMO_EXECUTOR_PASSWORD,
+            "full_name": "Demo Executor",
+            "role": UserRole.executor,
+        },
+    ]
+
+    created_count = 0
+    for entry in demo_users:
+        result = await db.execute(select(User).where(User.email == entry["email"]))
+        user = result.scalar_one_or_none()
+        if user:
+            continue
+
+        user = User(
+            email=entry["email"],
+            password_hash=hash_password(entry["password"]),
+            full_name=entry["full_name"],
+            role=entry["role"],
+        )
+        db.add(user)
+        await db.flush()
+        db.add(Profile(user_id=user.id))
+        created_count += 1
+
+    if created_count:
+        await db.commit()
+        logger.info("Created %d demo users", created_count)

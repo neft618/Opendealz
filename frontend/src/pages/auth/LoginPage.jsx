@@ -27,7 +27,7 @@ export function LoginPage() {
     try {
       setLoading(true);
       const { data: tokens } = await authApi.login(data);
-      const { data: user } = await authApi.me();
+      const { data: user } = await authApi.me(tokens.access_token);
       login(user, tokens.access_token, tokens.refresh_token);
       navigate('/orders');
     } catch (err) {
