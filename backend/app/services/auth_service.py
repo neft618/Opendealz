@@ -65,7 +65,10 @@ async def register_user(
     )
 
     await db.commit()
-    await db.refresh(user)
+    result = await db.execute(
+        select(User).options(selectinload(User.profile)).where(User.id == user.id)
+    )
+    user = result.scalar_one()
 
     await send_email(
         user.email,

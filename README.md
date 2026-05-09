@@ -39,8 +39,8 @@ cp ./frontend/.env.example ./frontend/.env
 ## Тестовые данные (для ручной проверки UI)
 
 Тестовые логины для входа (создаются автоматически при старте backend):
-- **Customer**: `customer@opendealz.local` / `Customer123!`
-- **Executor**: `executor@opendealz.local` / `Executor123!`
+- **Customer**: `customer@opendealz.example.com` / `Customer123!`
+- **Executor**: `executor@opendealz.example.com` / `Executor123!`
   
 При необходимости можно отключить/изменить их через `DEMO_USERS_*` переменные в `backend/.env`.
 
