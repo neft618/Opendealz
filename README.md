@@ -22,9 +22,12 @@ docker compose up
 Если хотите свои настройки:
 
 ```bash
-cp /home/runner/work/Opendealz/Opendealz/backend/.env.example /home/runner/work/Opendealz/Opendealz/backend/.env
-cp /home/runner/work/Opendealz/Opendealz/frontend/.env.example /home/runner/work/Opendealz/Opendealz/frontend/.env
+cp ./backend/.env.example ./backend/.env
+cp ./frontend/.env.example ./frontend/.env
 ```
+
+`SECRET_KEY` в `docker-compose.yml` имеет dev-значение по умолчанию только для локального запуска.  
+Для продакшена обязательно задайте свой секрет в `backend/.env`.
 
 ## Как проверить, что все поднялось
 
