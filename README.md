@@ -26,8 +26,8 @@ cp ./backend/.env.example ./backend/.env
 cp ./frontend/.env.example ./frontend/.env
 ```
 
-`SECRET_KEY` при Docker-запуске генерируется автоматически, если не задан вручную.  
-Для продакшена обязательно задайте `SECRET_KEY` и `POSTGRES_PASSWORD` через `backend/.env`.
+Для локального запуска используются dev-значения `SECRET_KEY` и `POSTGRES_PASSWORD` из `docker-compose.yml`.  
+Для продакшена обязательно задайте свои `SECRET_KEY` и `POSTGRES_PASSWORD` через `backend/.env`.
 
 ## Как проверить, что все поднялось
 
