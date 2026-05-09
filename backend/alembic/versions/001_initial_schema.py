@@ -16,22 +16,6 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Create ENUM types
-    op.execute("CREATE TYPE user_role AS ENUM ('customer', 'executor', 'admin')")
-    op.execute("CREATE TYPE specialization AS ENUM ('web_development', 'mobile_development', 'data_science', 'design', 'marketing', 'other')")
-    op.execute("CREATE TYPE order_status AS ENUM ('open', 'in_progress', 'closed', 'cancelled')")
-    op.execute("CREATE TYPE application_status AS ENUM ('pending', 'accepted', 'rejected')")
-    op.execute("CREATE TYPE contract_status AS ENUM ('draft', 'signed', 'in_progress', 'completed', 'disputed', 'cancelled')")
-    op.execute("CREATE TYPE payment_type AS ENUM ('fixed', 'hourly', 'milestone')")
-    op.execute("CREATE TYPE clause_type AS ENUM ('subject_description', 'timeline', 'payment_terms', 'termination_conditions', 'result_review_period', 'refund_policy', 'platform_commission', 'ip_rights', 'confidentiality')")
-    op.execute("CREATE TYPE milestone_status AS ENUM ('pending', 'in_progress', 'approved', 'rejected')")
-    op.execute("CREATE TYPE escrow_tx_type AS ENUM ('lock', 'release', 'refund', 'fee')")
-    op.execute("CREATE TYPE escrow_tx_status AS ENUM ('pending', 'confirmed', 'failed')")
-    op.execute("CREATE TYPE initiated_by AS ENUM ('customer', 'executor', 'shared', 'system')")
-    op.execute("CREATE TYPE dispute_status AS ENUM ('open', 'under_review', 'resolved')")
-    op.execute("CREATE TYPE dispute_resolution AS ENUM ('executor', 'customer', 'shared')")
-    op.execute("CREATE TYPE notification_type AS ENUM ('contract', 'payment', 'dispute', 'system')")
-
     # users table
     op.create_table(
         'users',

@@ -49,7 +49,7 @@ class EscrowTransaction(Base):
         SAEnum(InitiatedBy, name="initiated_by", create_type=True), nullable=False
     )
     tx_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    metadata_: Mapped[Optional[dict]] = mapped_column("metadata", JSONB, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

@@ -53,7 +53,7 @@ async def lock_funds(
         status=EscrowTxStatus.confirmed,
         initiated_by=InitiatedBy.system,
         tx_hash=tx_hash,
-        metadata={"action": "lock", "amount": float(contract.total_amount)},
+        metadata_={"action": "lock", "amount": float(contract.total_amount)},
     )
     db.add(tx)
     await db.flush()
@@ -87,7 +87,7 @@ async def release_funds(
         status=EscrowTxStatus.confirmed,
         initiated_by=InitiatedBy.customer,
         tx_hash=tx1_hash,
-        metadata={"action": "release", "recipient": str(contract.executor_id)},
+        metadata_={"action": "release", "recipient": str(contract.executor_id)},
     )
     tx2 = EscrowTransaction(
         contract_id=contract.id,
@@ -96,7 +96,7 @@ async def release_funds(
         status=EscrowTxStatus.confirmed,
         initiated_by=InitiatedBy.system,
         tx_hash=tx2_hash,
-        metadata={"action": "fee", "platform_fee": fee_amount},
+        metadata_={"action": "fee", "platform_fee": fee_amount},
     )
     db.add(tx1)
     db.add(tx2)
@@ -127,7 +127,7 @@ async def refund_funds(
         status=EscrowTxStatus.confirmed,
         initiated_by=InitiatedBy.system,
         tx_hash=tx_hash,
-        metadata={"action": "refund", "recipient": str(contract.customer_id)},
+        metadata_={"action": "refund", "recipient": str(contract.customer_id)},
     )
     db.add(tx)
     await db.flush()
@@ -161,7 +161,7 @@ async def release_shared(
         status=EscrowTxStatus.confirmed,
         initiated_by=InitiatedBy.shared,
         tx_hash=hash1,
-        metadata={"action": "shared_release_executor"},
+        metadata_={"action": "shared_release_executor"},
     )
     tx2 = EscrowTransaction(
         contract_id=contract.id,
@@ -170,7 +170,7 @@ async def release_shared(
         status=EscrowTxStatus.confirmed,
         initiated_by=InitiatedBy.shared,
         tx_hash=hash2,
-        metadata={"action": "shared_release_customer"},
+        metadata_={"action": "shared_release_customer"},
     )
     db.add(tx1)
     db.add(tx2)
