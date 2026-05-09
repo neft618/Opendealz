@@ -41,6 +41,8 @@ cp ./frontend/.env.example ./frontend/.env
 Тестовые логины для входа (создаются автоматически при старте backend):
 - **Customer**: `customer@opendealz.local` / `Customer123!`
 - **Executor**: `executor@opendealz.local` / `Executor123!`
+  
+При необходимости можно отключить/изменить их через `DEMO_USERS_*` переменные в `backend/.env`.
 
 Создание заказа:
 - **Title**: `Landing page redesign`

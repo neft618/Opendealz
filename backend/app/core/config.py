@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_ROLE_KEY: str = ""
     SUPABASE_BUCKET_PORTFOLIOS: str = "portfolios"
     SUPABASE_BUCKET_DELIVERABLES: str = "deliverables"
+    DEMO_USERS_ENABLED: bool = False
+    DEMO_CUSTOMER_EMAIL: str = ""
+    DEMO_CUSTOMER_PASSWORD: str = ""
+    DEMO_EXECUTOR_EMAIL: str = ""
+    DEMO_EXECUTOR_PASSWORD: str = ""
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

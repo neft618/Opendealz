@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.security import hash_password, verify_password, create_access_token, create_refresh_token, decode_token
+from app.core.config import settings
 from app.models.user import User, Profile, UserRole
 from app.models.audit import AuditLog
 from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse
@@ -110,22 +111,33 @@ async def refresh_tokens(db: AsyncSession, refresh_token: str) -> TokenResponse:
 
 
 async def ensure_demo_users(db: AsyncSession) -> None:
+    if not settings.DEMO_USERS_ENABLED:
+        return
+    if not all([
+        settings.DEMO_CUSTOMER_EMAIL,
+        settings.DEMO_CUSTOMER_PASSWORD,
+        settings.DEMO_EXECUTOR_EMAIL,
+        settings.DEMO_EXECUTOR_PASSWORD,
+    ]):
+        logger.warning("Demo users are enabled but credentials are not fully configured")
+        return
+
     demo_users = [
         {
-            "email": "customer@opendealz.local",
-            "password": "Customer123!",
+            "email": settings.DEMO_CUSTOMER_EMAIL,
+            "password": settings.DEMO_CUSTOMER_PASSWORD,
             "full_name": "Demo Customer",
             "role": UserRole.customer,
         },
         {
-            "email": "executor@opendealz.local",
-            "password": "Executor123!",
+            "email": settings.DEMO_EXECUTOR_EMAIL,
+            "password": settings.DEMO_EXECUTOR_PASSWORD,
             "full_name": "Demo Executor",
             "role": UserRole.executor,
         },
     ]
 
-    created = False
+    created_count = 0
     for entry in demo_users:
         result = await db.execute(select(User).where(User.email == entry["email"]))
         user = result.scalar_one_or_none()
@@ -141,8 +153,8 @@ async def ensure_demo_users(db: AsyncSession) -> None:
         db.add(user)
         await db.flush()
         db.add(Profile(user_id=user.id))
-        created = True
+        created_count += 1
 
-    if created:
+    if created_count:
         await db.commit()
-        logger.info("Demo users created")
+        logger.info("Created %d demo users", created_count)
